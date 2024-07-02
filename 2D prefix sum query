@@ -1,0 +1,39 @@
+ void sol() {
+    // when its a hacking contest please use map instead of unordered map
+
+   
+        ll n,m,q;
+        cin>>n>>m>>q;
+        ll a[n][m];
+        ll i,j;
+        for(i=0;i<n;i++){
+            for(j=0;j<m;j++){
+                cin>>a[i][j];
+            }
+        }
+        ll P[n][m];
+         for (i = 0; i < n; ++i) {
+        for (j = 0; j < m; ++j) {
+            P[i][j] = a[i][j];
+            if (i > 0) P[i][j] += P[i - 1][j];
+            if (j > 0) P[i][j] += P[i][j - 1];
+            if (i > 0 && j > 0) P[i][j] -= P[i - 1][j - 1];
+            P[i][j] = P[i][j]%MOD;
+        }
+    }
+    while(q--){
+        ll x1,y1,x2,y2;
+        cin>>x1>>y1>>x2>>y2;
+         ll ans = P[x2-1][y2-1];
+    if (y1> 1) ans -= P[x2-1][y1 - 2];
+    if (x1 > 1) ans -= P[x1 - 2][y2-1];
+    if (x1 > 1 && y1 > 1) ans += P[x1 - 2][y1 - 2];
+     ans = (ans % MOD + MOD) % MOD;
+    cout<<ans<<endl;
+
+    }
+
+
+    
+   }
+    
