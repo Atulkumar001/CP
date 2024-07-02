@@ -1,0 +1,69 @@
+ll factoriall[MAX];
+
+void precompute_factorials() {
+    factoriall[0] = 1;
+    for (int i = 1; i < MAX; i++) {
+        factoriall[i] = factoriall[i - 1] * i % MOD;
+    }
+}
+        
+
+
+// Binary exponentiation
+ll bin_pow(ll base, ll exp, ll mod) {
+    ll result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+// nCr calculation using precomputed factorials
+
+        
+      void sol() {
+    // when its a hacking contest please use map instead of unordered map
+      ll n,m;
+      cin>>n>>m;
+      ll factnm = factoriall[n+m];
+      ll facttn = factoriall[n];
+      ll facttm = factoriall[m];
+      ll dprod = ((facttn%MOD)*(facttm%MOD))%MOD;
+      ll drpodin = bin_pow(dprod,MOD-2,MOD);
+      ll ans = ((factnm%MOD)*(drpodin%MOD))%MOD;
+      ans = (ans+MOD)%MOD;
+      cout<<ans<<"\n";
+
+
+   
+
+
+
+    
+   }
+    
+
+                     
+    int main() {
+
+             precompute_factorials(); // Initialize factorials
+            
+        ll t;
+        cin>>t;
+      
+
+        
+       while(t--)
+    {
+
+    sol();
+        
+     
+    }
+     
+     
+     
+        return 0;
+    }
