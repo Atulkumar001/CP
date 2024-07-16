@@ -1,0 +1,64 @@
+A monotonic deque, short for monotonic dequeue or monotone decreasing dequeue, is a data structure that maintains elements in non-increasing order while allowing for efficient insertion and removal operations. It is often used in problems where you need to track the minimum (or maximum) element in a sliding window of a sequence.
+
+Insert Operation (insert): The insert operation in the monotone deque is used to insert an element into the deque. It maintains the monotonicity property by popping elements from the back of the deque until the back element is less than or equal to the new element.
+
+Erase Operation (erase): The erase operation is used to remove an element from the deque. It removes the front element if it matches the specified value.
+
+Get Minimum Operation (getmin): The getmin operation returns the minimum element in the deque, which is always at the front due to the monotonic property.
+
+Why "Monotone" Deque: The term "monotone" refers to the property that the elements in the deque maintain either non-increasing or non-decreasing order. In this case, the monotone deque is non-increasing. As elements are inserted, the deque remains sorted in non-increasing order.
+
+Why Use Monotone Deque: The monotone deque efficiently maintains the minimum element in a sliding window of size k. It allows constant time complexity for insertion, erasure, and retrieval of the minimum element. The use of a deque ensures that elements within the current window are sorted in non-increasing order, making it easy to access the minimum.
+
+Code:
+
+#include <bits/stdc++.h>
+using namespace std;
+
+struct monotone_deque
+{
+    deque<int> dq;
+
+    void insert(int x)
+    { // O(k)
+        while (!dq.empty() && dq.back() > x)
+            dq.pop_back();
+        dq.push_back(x);
+    }
+    void erase(int x)
+    { // O(1)
+        if (dq.front() == x)
+            dq.pop_front();
+    }
+    int getmin()
+    { // O(1)
+        return dq.front();
+    }
+};
+
+
+int main()
+{ // O(n)
+    int n, k;
+    cin >> n >> k;
+    int arr[n];
+    for (int i = 0; i < n; i++)
+    {
+        cin >> arr[i];
+    }
+
+    monotone_deque mt;
+    for (int i = 0; i < n; i++)
+    {                      // O(n)
+        mt.insert(arr[i]); // O(1)
+        if ((i - k) >= 0)
+            mt.erase(arr[i - k]); // O(1)
+        if (i >= (k - 1))
+            cout << mt.getmin() << endl; // O(1)
+    }
+}
+The time complexity is O(n), where n is the size of the array. The easy way to understand the complexity is that at each element two operations are done, one is insertion and second is pop, nothing else.
+
+
+
+// here we have concept of amortized TC as if we see average tc for removal is logk but if we consider the case for full array then we will see that there is only one time we need to remove k after that its o(1) , thats why it is o(n)*o(1) 
