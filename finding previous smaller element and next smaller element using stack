@@ -1,0 +1,38 @@
+  int n = arr.size();
+        int i;
+        vector<int>psm;
+// psm is just previous smaller element
+           stack<int>s;
+    for(i=0;i<n;i++){
+        while(!s.empty()&& arr[s.top()]>=arr[i]){
+            s.pop();
+        }
+        if(s.empty()){
+            psm.push_back(0);
+        }
+        else{
+            int temp = s.top();
+            psm.push_back(arr[temp]);
+        }
+        s.push(i);
+
+    }
+    vector<int>nsm;
+// nsm is next smaller element
+       stack<int>s1;
+    for(i=n-1;i>=0;i--){
+        while(!s1.empty()&& arr[s1.top()]>=arr[i]){
+            s1.pop();
+        }
+        if(s1.empty()){
+           nsm.push_back(0);
+        }
+        else{
+            
+             int temp = s1.top();
+            nsm.push_back(arr[temp]);
+        }
+        s1.push(i);
+
+    }
+    reverse(nsm.begin(),nsm.end());
