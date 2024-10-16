@@ -1,0 +1,68 @@
+class Solution {
+public:
+    
+    int numsubarray(vector<int>& nums, int k){
+        int n  = nums.size();
+        int tail =0;
+        int head = -1;
+      
+        // data structure for the window
+      
+        map<int,int>mp;
+        int distinctcnt =0;
+
+      
+        // answer maintain
+
+      
+        int ans =0;
+
+      
+        // for every start
+      
+        while(tail<n){
+          
+            // eat as many elements as possible till its valid
+          
+            while(head+1<n && (distinctcnt<k || mp[nums[head+1]]>=1)){
+                head++;
+              
+                // insert ds(head)
+              
+                if(mp[nums[head]]==0){
+                    distinctcnt++;
+                }
+                mp[nums[head]]++;
+            }
+          
+            // update answer for current start
+          
+            ans+=(head-tail+1);
+          
+            // move start one step forward
+          
+            if(tail>head){
+                tail++;
+                head = tail-1;
+            }
+            else{
+              
+                // erase from ds(tail)
+              
+                mp[nums[tail]]--;
+                if(mp[nums[tail]]==0){
+                    distinctcnt--;
+                }
+                tail++;
+            }
+        }
+        return ans;
+    }
+    int subarraysWithKDistinct(vector<int>& nums, int k) {
+        int n = nums.size();
+        int ansfork = numsubarray(nums,k);
+        int ansforkm1 = numsubarray(nums,k-1);
+        return ansfork-ansforkm1;
+        
+    }
+};
