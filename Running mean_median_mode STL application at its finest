@@ -1,0 +1,187 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const long long MOD = 1000000007;
+
+// A structure to maintain the elements and perform required operations
+struct bag {
+    long long sum = 0;      // sum of elements (no modulo here)
+    long long count = 0;    // number of elements
+    map<long long, long long> freq; // frequency map
+
+    // freq_order keeps track of (frequency, value) to find max frequency easily
+    multiset<pair<long long, long long>> freq_order;
+
+    multiset<long long> low, high; // two multisets to maintain median
+
+    void balance() {
+        // Ensure that low has either equal number of elements as high (when even total)
+        // or one more element than high (when odd total).
+        if (low.size() < high.size()) {
+            long long x = *high.begin();
+            high.erase(high.begin());
+            low.insert(x);
+        } else if (low.size() > high.size() + 1) {
+            long long x = *low.rbegin();
+            low.erase(low.find(x));
+            high.insert(x);
+        }
+    }
+
+    void insert_element(long long x) {
+        count++;
+        sum += x;
+
+        // Remove old frequency pair if exists
+        if (freq[x] > 0) {
+            freq_order.erase(freq_order.find({freq[x], x}));
+        }
+
+        // Increase frequency and add new pair
+        freq[x]++;
+        freq_order.insert({freq[x], x});
+
+        // Insert into median structure
+        if (low.empty() || x <= *low.rbegin()) {
+            low.insert(x);
+        } else {
+            high.insert(x);
+        }
+
+        balance();
+    }
+
+    void remove_element(long long x) {
+        count--;
+        sum -= x;
+
+        // Remove old frequency pair
+        freq_order.erase(freq_order.find({freq[x], x}));
+
+        freq[x]--;
+        if (freq[x] > 0) {
+            freq_order.insert({freq[x], x});
+        }
+
+        // Remove from median structure
+        if (low.find(x) != low.end()) {
+            low.erase(low.find(x));
+        } else {
+            high.erase(high.find(x));
+        }
+
+        balance();
+    }
+
+    // Modular inverse using Fermat's little theorem since MOD is prime
+    long long modInverse(long long a, long long m) {
+        long long res = 1, exp = m - 2;
+        while (exp > 0) {
+            if (exp & 1) res = (res * a) % m;
+            a = (a * a) % m;
+            exp >>= 1;
+        }
+        return res;
+    }
+
+    // Print the mean of elements
+    // mean = sum / count
+    int getMean() {
+        if (count == 0) {
+            return -1;
+        }
+        // If sum divisible by count => integer
+        if (sum % count == 0) {
+            return (int)(sum / count);
+        } else {
+            // fraction
+            long long P = sum, Q = count;
+            long long g = __gcd(P, Q);
+            P /= g;
+            Q /= g;
+            long long invQ = modInverse(Q, MOD);
+            long long ans = (P % MOD) * invQ % MOD;
+            return (int)ans;
+        }
+    }
+
+    // Print the median of elements
+    // if odd count: median = largest element in low
+    // if even count: median = (max of low + min of high) / 2
+    int getMedian() {
+        if (count == 0) {
+            return -1;
+        }
+        if (count % 2 == 1) {
+            // odd
+            return (int)*low.rbegin();
+        } else {
+            // even
+            long long L = *low.rbegin();
+            long long R = *high.begin();
+            long long val = L + R;
+            if (val % 2 == 0) {
+                return (int)(val / 2);
+            } else {
+                // fraction
+                long long P = val, Q = 2;
+                // long long g = __gcd(P, Q);
+                // P /= g;
+                // Q /= g;
+                long long invQ = modInverse(Q, MOD);
+                long long ans = ((P % MOD) * invQ) % MOD;
+                return (int)ans;
+            }
+        }
+    }
+
+    // Print the mode of elements
+    // mode is element with highest frequency
+    // if tie, smallest element
+    int getMode() {
+        if (count == 0) return -1;
+        long long mxfreq = freq_order.rbegin()->first;
+        long long ans = LLONG_MAX;
+        // Iterate over freq map to find smallest element with mxfreq
+        // Since freq map can be large, consider another approach:
+        // freq_order holds (freq, val) in ascending order, we can just find minimal val with mxfreq.
+        // But freq_order is sorted by freq then val, we need only minimal val with max freq:
+        // We'll do a separate pass since problem constraints allow it.
+
+        for (auto &it : freq) {
+            if (it.second == mxfreq) {
+                ans = min(ans, it.first);
+            }
+        }
+
+        return (int)ans;
+    }
+};
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int t; cin >> t;
+    while (t--) {
+        int Q; cin >> Q;
+        bag b;
+        while (Q--) {
+            string op; cin >> op;
+            if (op == "insert") {
+                long long x; cin >> x;
+                b.insert_element(x);
+            } else if (op == "remove") {
+                long long x; cin >> x;
+                b.remove_element(x);
+            } else if (op == "getMean") {
+                cout << b.getMean() << "\n";
+            } else if (op == "getMedian") {
+                cout << b.getMedian() << "\n";
+            } else if (op == "getMode") {
+                cout << b.getMode() << "\n";
+            }
+        }
+    }
+    return 0;
+}
