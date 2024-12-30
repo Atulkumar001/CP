@@ -1,12 +1,23 @@
+static const int MAX = 100001; 
 ll factoriall[MAX];
+ll inv_factorial_arr[MAX];
 
-void precompute_factorials() {
-    factoriall[0] = 1;
-    for (int i = 1; i < MAX; i++) {
-        factoriall[i] = factoriall[i - 1] * i % MOD;
+ void precompute_factorials() {
+       
+        factoriall[0] = 1;
+        for (int i = 1; i < MAX; i++) {
+            factoriall[i] = (factoriall[i - 1] * i) % MOD;
+        }
+
+        // Compute inverse of factorial[MAX-1] using Fermat's Little Theorem
+        inv_factorial_arr[MAX - 1] = bin_pow(factoriall[MAX - 1], MOD - 2, MOD);
+
+        // Compute inverse factorials in reverse order
+        for (int i = MAX - 2; i >= 0; i--) {
+            inv_factorial_arr[i] = (inv_factorial_arr[i + 1] * (i + 1)) % MOD;
+        }
     }
-}
-        
+     
 
 
 // Binary exponentiation
@@ -21,6 +32,10 @@ ll bin_pow(ll base, ll exp, ll mod) {
 }
 
 // nCr calculation using precomputed factorials
+ ll comb(int a, int b) {
+       
+        return (factoriall[a] * inv_factorial_arr[b] % MOD) * inv_factorial_arr[a - b] % MOD;
+    }
 
         
       void sol() {
