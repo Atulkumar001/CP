@@ -1,0 +1,33 @@
+ bool is_cycle =0;
+    vector<int>vis;
+    vector<vector<int>>adj;
+    void dfs(int node){
+        vis[node]=1;
+        for(auto v: adj[node]){
+            if(vis[v]==0){
+                // node -v is a forward edge
+                dfs(v);
+            }
+            else if(vis[v]==1){
+                // node -v is a back edge
+                // we found a cycle
+                is_cycle =1;
+            }
+            else if(vis[v]==2){
+                // not important
+            }
+        }
+        vis[node] =2;
+    }
+
+
+    ///////////////////////////////////// in main function////////////////////////////////////////////
+
+    
+     for(int i=0;i<n;i++){
+            if(vis[i]==0){
+                dfs(i);
+            }
+        }
+
+        return is_cycle;
