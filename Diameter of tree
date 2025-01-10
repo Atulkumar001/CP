@@ -1,0 +1,65 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+vector<vector<int>> adj;
+vector<int> vis;
+vector<int> dist;
+
+// DFS function to compute distances from the source node
+void dfs(int source, int current_dist, vector<int> &dist, vector<int> &vis){
+    vis[source] = 1;
+    dist[source] = current_dist;
+    for(auto it: adj[source]){
+        if(!vis[it]){
+            dfs(it, current_dist + 1, dist, vis);
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(0); // Fast IO
+
+    int n;
+    cin >> n;
+    adj.resize(n + 1); // 1-based indexing
+    vis.resize(n + 1, 0);
+    dist.resize(n + 1, 1e9); // Initialize distances to "infinity"
+
+    for(int i = 0; i < n - 1; i++){
+        int a, b;
+        cin >> a >> b;
+        adj[a].push_back(b);
+        adj[b].push_back(a); // Ensure the graph is undirected
+    }
+
+    // First DFS from node 1
+    dfs(1, 0, dist, vis);
+
+    // Find the farthest node from node 1
+    int farthestdist = 0;
+    int farthestnode = 1;
+    for(int i = 1; i <= n; i++){
+        if(dist[i] > farthestdist){
+            farthestdist = dist[i];
+            farthestnode = i;
+        }
+    }
+
+    // Reset for the second DFS
+    fill(vis.begin(), vis.end(), 0);
+    dist.assign(n + 1, 1e9); // Reset distances
+
+    // Second DFS from the farthest node found
+    dfs(farthestnode, 0, dist, vis);
+
+    // Find the maximum distance in the second DFS, which is the diameter
+    int diameter = 0;
+    for(int i = 1; i <= n; i++){
+        diameter = max(diameter, dist[i]);
+    }
+
+    cout << diameter << "\n";
+
+    return 0;
+}
