@@ -1,0 +1,56 @@
+Problem Statement
+There are N ranks and M students in a class. Each student has a happiness value for the rank in the class they get. The i-th student gets happy[i][j] on getting a rank j. It’s okay to not keep all students in the ranks (they get 0 happiness). At most one student can be assigned to a rank.
+
+The total happiness of the assignment can be calculated as the sum of happiness of each student in the class. Find the best way to calculate the maximum happiness attainable.
+
+Constraints:
+1 ≤ N ≤ 15
+1 ≤ M ≤ 50
+0 ≤ happy[i][j] ≤ 10⁵
+Solution Approach
+To solve this problem efficiently, we use Bitmask DP. The naive approach would be to try all possible assignments of students to ranks, but this would lead to an exponential O(M! / (M-N)!) complexity, which is impractical.
+
+Why Do We Need a Mask?
+Since we need to track which ranks have already been assigned, we use a bitmask where each bit represents whether a specific rank is occupied.
+
+What Should We Mask Upon: Ranks or Students?
+We have N ranks and M students, with N ≤ 15 and M ≤ 50. Since N is smaller, we will keep a mask on ranks to track which ones are already taken. This allows us to iterate over students efficiently while checking the mask for available ranks.
+
+Recursive Approach
+We define our state as:
+
+level → The current student we are assigning a rank to.
+mask → A bitmask representing which ranks have already been taken.
+Thus, our function:
+
+rec(level, mask)
+returns the maximum happiness attainable when we are at the level-th student and have already taken the ranks represented by mask.
+
+Transitions
+Skip assigning the current student a rank: Move to the next student without changing the mask.
+rec(level + 1, mask)
+Assign the student to an available rank: Iterate over all ranks and if rank i is not taken, assign it to the level-th student, increasing the total happiness by happy[level][i].
+rec(level + 1, mask | (1 << i)) + happy[level][i]
+This recursive approach ensures we explore all valid assignments while using bitmasking to efficiently track rank allocations.
+
+Code
+int rec(int level, int mask) {
+    if (level == m) {
+        return 0;
+    }
+    if (dp[level][mask] != -1) return dp[level][mask];
+
+    int ans = 0;
+
+    // Case 1: Skip assigning this student to any rank
+    ans = max(ans, rec(level + 1, mask));
+
+    // Case 2: Try assigning the student to an available rank
+    for (int i = 0; i < n; i++) {
+        if ((mask & (1 << i)) == 0) { // Check if rank i is available
+            ans = max(ans, arr[level][i] + rec(level + 1, (mask | (1 << i))));
+        }
+    }
+
+    return dp[level][mask] = ans;
+}
