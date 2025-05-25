@@ -1,0 +1,65 @@
+class Solution {
+public:
+    static const int MOD = 1e9+7;
+    vector<int> powerof2;
+    
+   static const int MM = 2e5 + 5, LOG = 19;
+    int up[MM][LOG], dep[MM];
+    vector<vector<int>> adj;
+
+
+    void dfs1(int u, int pa) {
+        up[u][0] = pa; 
+        dep[u] = dep[pa] + 1;
+        for (int i = 1; i < LOG; i++) {
+              up[u][i] = up[up[u][i - 1]][i - 1];
+          }
+        for (int v : adj[u]){
+            if (v != pa) dfs1(v, u);
+        }
+    }
+    int LCA(int u, int v) {
+        if (dep[u] < dep[v]) swap(u, v);
+        int diff = dep[u] - dep[v];
+        for (int i = LOG - 1; i >= 0; i--) {
+            if ((diff & (1 << i))) u = up[u][i];
+        }
+        if (u == v) return u;
+        for (int i = LOG - 1; i >= 0; i--)
+            if (up[u][i] != up[v][i]) u = up[u][i], v = up[v][i];
+        return up[u][0];
+    }
+
+
+
+    vector<int> assignEdgeWeights(vector<vector<int>>& e,
+                                  vector<vector<int>>& q) {
+        int m = e.size();
+       int N = m+1;
+        adj.assign(N+1, {});
+
+        powerof2.assign(N+1, 1);
+        for (int i = 1; i <= N; ++i)
+            powerof2[i] = (int)(powerof2[i-1] * 2LL % MOD);
+
+
+        
+        for (auto &ei : e) {
+            int a = ei[0], b = ei[1];
+            adj[a].push_back(b);
+            adj[b].push_back(a);
+        }
+
+        dfs1(1, 0);
+       
+        int Q = q.size();
+        vector<int> ans(Q);
+        for (int i = 0; i < Q; ++i) {
+            int u = q[i][0], v = q[i][1];
+            int w = LCA(u, v);
+            int D = dep[u] + dep[v] - 2*dep[w];
+            ans[i] = (D == 0 ? 0 : powerof2[D-1]);
+        }
+        return ans;
+    }
+};
