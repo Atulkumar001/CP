@@ -1,0 +1,1 @@
+This Repository contains templates and frameworks to solve the common and tricky DS problems, the motto of creating this repository was to maintain a framework that one can apply to almost every problems without thinking about the edge cases, I add something whenever i find some cool concepts or problem.
